@@ -20,3 +20,20 @@ https://ryuu12358.github.io/Frockly/
 npm install
 npm run dev
 
+##build
+
+npm run build
+The production build will be generated in the build/ directory.
+
+##License
+
+This project uses third-party open-source libraries.
+See THIRD_PARTY_LICENSES.txt for details.
+
+
+---
+
+```md
+## Design
+Initial UI design was explored in Figma:
+https://www.figma.com/design/XXXX
