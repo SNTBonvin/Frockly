@@ -20,12 +20,12 @@ https://ryuu12358.github.io/Frockly/
 npm install
 npm run dev
 
-##build
+## build
 
 npm run build
 The production build will be generated in the build/ directory.
 
-##License
+## License
 
 This project uses third-party open-source libraries.
 See THIRD_PARTY_LICENSES.txt for details.
