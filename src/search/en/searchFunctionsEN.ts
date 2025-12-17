@@ -3,7 +3,7 @@ import { loadFnIndex } from "./loadIndex";
 import { embedQuery } from "./embed";
 import { searchTopN } from "./searchFn";
 
-const indexPromise = loadFnIndex("/embed/en");
+const indexPromise = loadFnIndex();
 
 export async function searchFunctionsEN(query: string, limit = 7) {
   const { meta, vecs } = await indexPromise;

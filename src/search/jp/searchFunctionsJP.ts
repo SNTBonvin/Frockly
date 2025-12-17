@@ -1,9 +1,9 @@
 // src/search/jp/searchFunctionsJP.ts
 import { loadFnIndex } from "./loadIndex";
 import { embedQuery } from "./embed";
-import { searchTopN } from "../en/searchFn"; // 共有ならここ。場所違うなら合わせて。
+import { searchTopN } from "../en/searchFn";
 
-const indexPromise = loadFnIndex("/embed/jp");
+const indexPromise = loadFnIndex(); // ← ここ！引数消す
 
 export async function searchFunctionsJP(query: string, limit = 7) {
   const { meta, vecs } = await indexPromise;
