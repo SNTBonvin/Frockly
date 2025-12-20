@@ -13,7 +13,10 @@ export interface ExcelRibbonProps {
 
   uiLang: "en" | "ja";
   onUiLangChange: (lang: "en" | "ja") => void;
-  onWorkspaceApi?: { insertFromFormula?: (formula: string) => void };
+  // Parent may pass either the api object or a React ref containing it.
+  onWorkspaceApi?:
+    | { insertFromFormula?: (formula: string) => void }
+    | { current: { insertFromFormula?: (formula: string) => void } | null };
 }
 
 function FrogIcon() {
@@ -404,7 +407,15 @@ export function ExcelRibbon({
                   const text = importText.trim();
                   if (!text) return;
 
-                  const fn = onWorkspaceApi?.insertFromFormula;
+                  // onWorkspaceApi may be a ref (`{ current }`) or the plain api object.
+                  const apiObj =
+                    onWorkspaceApi &&
+                    typeof onWorkspaceApi === "object" &&
+                    "current" in onWorkspaceApi
+                      ? (onWorkspaceApi as any).current
+                      : onWorkspaceApi;
+
+                  const fn = apiObj?.insertFromFormula;
                   if (!fn) {
                     alert(t(STR_ALL.IMPORT_API_NOT_READY));
                     return;

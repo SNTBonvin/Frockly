@@ -4,7 +4,7 @@ import { STR_ALL, tr } from "../i18n/strings";
 import "blockly/blocks";
 import { initFrockly } from "../blocks/initFrockly";
 import { ExcelGen } from "../blocks/basic/generators";
-
+import { blockFromFormula } from "../formula";
 export function BlocklyWorkspace({
   category,
   onFormulaChange,
@@ -38,7 +38,7 @@ export function BlocklyWorkspace({
     const t = tr(uiLang);
     return `
       <xml xmlns="https://developers.google.com/blockly/xml">
-        <category name="${t(STR_ALL.BASIC).replace(/&/g, '&amp;')}">
+        <category name="${t(STR_ALL.BASIC).replace(/&/g, "&amp;")}">
           <block type="basic_start"></block>
 
           <block type="basic_number"></block>
@@ -54,11 +54,13 @@ export function BlocklyWorkspace({
           <!-- <block type="basic_bool"></block> -->
         </category>
 
-        <category name="${t(STR_ALL.HISTORY).replace(/&/g, '&amp;')}" custom="FROCKLY_HISTORY"></category>
+        <category name="${t(STR_ALL.HISTORY).replace(
+          /&/g,
+          "&amp;"
+        )}" custom="FROCKLY_HISTORY"></category>
       </xml>
     `;
   }, [uiLang]);
-
 
   useEffect(() => {
     const hostEl = hostRef.current;
@@ -160,48 +162,69 @@ export function BlocklyWorkspace({
           pushHistory(type);
           onHostPointerDown();
         },
+        // ★追加：数式→ブロック
+        insertFromFormula: (formulaText: string) => {
+          const w = wsRef.current;
+          console.log("[WS] insertFromFormula", { hasWs: !!w, formulaText });
+
+          if (!w) return;
+
+          try {
+            // 既存を消したいなら一旦OFFで（まず動作優先）
+            // w.clear();
+
+            const start = blockFromFormula(w, formulaText);
+            console.log("[WS] blockFromFormula OK", { startId: start?.id });
+
+            w.resize();
+          } catch (e) {
+            console.error("[WS] blockFromFormula crashed", e);
+            alert("blockFromFormula が落ちた。console見て！");
+          }
+        },
       });
 
+      const onBlocklyEvent = (e: Blockly.Events.Abstract) => {
+        if (e.isUiEvent) return; // 余計なの除外（任意）
+        // ★ドラッグ中・プレビュー系は無視（ここ重要）
+        if (
+          e.type === Blockly.Events.BLOCK_DRAG ||
+          e.type === Blockly.Events.SELECTED ||
+          e.type === Blockly.Events.TOOLBOX_ITEM_SELECT
+        ) {
+          return;
+        }
+        if (e.type === Blockly.Events.BLOCK_CREATE) {
+          const ce = e as Blockly.Events.BlockCreate;
+          for (const id of ce.ids ?? []) {
+            const b = ws.getBlockById(id);
+            if (b) pushHistory(b.type);
+          }
+        }
 
-const onBlocklyEvent = (e: Blockly.Events.Abstract) => {
-  if (e.isUiEvent) return; // 余計なの除外（任意）
-  // ★ドラッグ中・プレビュー系は無視（ここ重要）
-  if (
-    e.type === Blockly.Events.BLOCK_DRAG ||
-    e.type === Blockly.Events.SELECTED ||
-    e.type === Blockly.Events.TOOLBOX_ITEM_SELECT
-  ) {
-    return;
-  }
-  if (e.type === Blockly.Events.BLOCK_CREATE) {
-    const ce = e as Blockly.Events.BlockCreate;
-    for (const id of ce.ids ?? []) {
-      const b = ws.getBlockById(id);
-      if (b) pushHistory(b.type);
-    }
-  }
+        // ★ここで start 起点に生成
+        const starts = ws
+          .getAllBlocks(false)
+          .filter((b) => b.type === "basic_start");
+        if (starts.length === 0) {
+          onFormulaChangeRef.current?.(""); // start無いなら空
+          return;
+        }
 
-  // ★ここで start 起点に生成
-  const starts = ws.getAllBlocks(false).filter(b => b.type === "basic_start");
-  if (starts.length === 0) {
-    onFormulaChangeRef.current?.(""); // start無いなら空
-    return;
-  }
+        const start = starts[0]; // 複数でもとりあえず先頭
 
-  const start = starts[0]; // 複数でもとりあえず先頭
-
-try {
-  ExcelGen.init(ws); // ★ これが必要
-  const out = ExcelGen.blockToCode(start);
-  const code = Array.isArray(out) ? String(out[0] ?? "") : String(out ?? "");
-  ExcelGen.finish(code); // ★ finish も一応呼ぶ（後片付け）
-  onFormulaChangeRef.current?.(code.trim());
-} catch (err) {
-  console.error("[GEN] blockToCode failed", err);
-}
-
-};
-
+        try {
+          ExcelGen.init(ws); // ★ これが必要
+          const out = ExcelGen.blockToCode(start);
+          const code = Array.isArray(out)
+            ? String(out[0] ?? "")
+            : String(out ?? "");
+          ExcelGen.finish(code); // ★ finish も一応呼ぶ（後片付け）
+          onFormulaChangeRef.current?.(code.trim());
+        } catch (err) {
+          console.error("[GEN] blockToCode failed", err);
+        }
+      };
 
       ws.addChangeListener(onBlocklyEvent);
     })();

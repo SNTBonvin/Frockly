@@ -13,11 +13,11 @@ export default function App() {
 
   type WorkspaceApi = {
     insertBlock: (t: string) => void;
-    insertRefBlock: (refText: string) => void; // ★追加
+    insertRefBlock: (refText: string) => void;
+    insertFromFormula: (formula: string) => void; // ★追加
   };
 
-const workspaceApiRef = useRef<WorkspaceApi | null>(null);
-
+  const workspaceApiRef = useRef<WorkspaceApi | null>(null);
 
   const [leftWidth, setLeftWidth] = useState(700);
 
@@ -43,26 +43,35 @@ const workspaceApiRef = useRef<WorkspaceApi | null>(null);
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       <ExcelRibbon
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-        onBlockClick={(blockType) => workspaceApiRef.current?.insertBlock(blockType)}
-        uiLang={uiLang}                 // ★追加
-        onUiLangChange={setUiLang}      // ★追加
+        selectedTab="functions"
+        onTabChange={() => {}}
+        onBlockClick={(blockType) =>
+          workspaceApiRef.current?.insertBlock(blockType)
+        }
+        uiLang={uiLang}
+        onUiLangChange={setUiLang}
+        onWorkspaceApi={workspaceApiRef} // pass the ref so Ribbon can read .current
       />
 
       <div className="flex-1 flex overflow-hidden">
-        <div style={{ width: leftWidth }} className="border-r border-gray-300 bg-white">
+        <div
+          style={{ width: leftWidth }}
+          className="border-r border-gray-300 bg-white"
+        >
           <ExcelGrid
-          
             selectedCell={selectedCell}
             onCellSelect={setSelectedCell}
-            onAddRefBlock={(refText) => workspaceApiRef.current?.insertRefBlock(refText)}
+            onAddRefBlock={(refText) =>
+              workspaceApiRef.current?.insertRefBlock(refText)
+            }
             uiLang={uiLang}
           />
-
         </div>
 
-        <div onMouseDown={startDrag} className="w-2 cursor-col-resize bg-gray-200 hover:bg-gray-300" />
+        <div
+          onMouseDown={startDrag}
+          className="w-2 cursor-col-resize bg-gray-200 hover:bg-gray-300"
+        />
 
         <div className="flex-1 flex flex-col bg-white">
           <div className="flex-1 border-b border-gray-300">
