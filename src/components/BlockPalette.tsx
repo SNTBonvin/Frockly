@@ -6,7 +6,6 @@ import { searchFunctionsEN } from "../search/en/searchFunctionsEN";
 import { searchFunctionsJP } from "../search/jp/searchFunctionsJP";
 import { STR, tr } from "../i18n/strings";
 
-
 function isAsciiOnly(s: string) {
   return /^[\x00-\x7F]*$/.test(s);
 }
@@ -20,10 +19,12 @@ interface BlockDef {
 interface BlockPaletteProps {
   search?: string;
   uiLang: "en" | "ja";
-  onBlockClick?: (type: string) => void;
-  
-}
+  onBlockClick?: (blockType: string) => void;
 
+  // ★追加
+  onHoverFn?: (fn: string | null) => void;
+  onSelectFn?: (fn: string) => void; // クリック固定したいなら
+}
 
 const PINNED_EXCEL = [
   "SUM",
@@ -52,26 +53,47 @@ function fnToBlockType(fn: string) {
   return `frockly_${fn.toUpperCase()}`;
 }
 
-export function BlockPalette({ search = "", uiLang, onBlockClick }: BlockPaletteProps) {
+export function BlockPalette({
+  search = "",
+  uiLang,
+  onBlockClick,
+  onHoverFn,
+  onSelectFn,
+}: BlockPaletteProps) {
   const t = useMemo(() => tr(uiLang), [uiLang]);
-useEffect(() => {
-  console.log("[PATH] Palette uiLang =", uiLang);
-}, [uiLang]);
+  useEffect(() => {
+    console.log("[PATH] Palette uiLang =", uiLang);
+  }, [uiLang]);
 
-  const BASE_BLOCKS: BlockDef[] = useMemo(() => ([
-    { type: "basic_start", label: "=", haystack: "= start" },
+  const BASE_BLOCKS: BlockDef[] = useMemo(
+    () => [
+      { type: "basic_start", label: "=", haystack: "= start" },
 
-    { type: "basic_number", label: t(STR.NUMBER), haystack: "number 数値" },
-    { type: "basic_string", label: t(STR.TEXT), haystack: "text 文字列" },
+      { type: "basic_number", label: t(STR.NUMBER), haystack: "number 数値" },
+      { type: "basic_string", label: t(STR.TEXT), haystack: "text 文字列" },
 
-    { type: "basic_cell", label: t(STR.CELL_REF), haystack: "cell ref セル参照" },
-    { type: "basic_range", label: t(STR.RANGE), haystack: "range レンジ" },
+      {
+        type: "basic_cell",
+        label: t(STR.CELL_REF),
+        haystack: "cell ref セル参照",
+      },
+      { type: "basic_range", label: t(STR.RANGE), haystack: "range レンジ" },
 
-    { type: "basic_arith", label: t(STR.ARITH), haystack: "arith 四則 + - * /" },
-    { type: "basic_cmp", label: t(STR.CMP), haystack: "compare 比較 = <> < <= > >=" },
+      {
+        type: "basic_arith",
+        label: t(STR.ARITH),
+        haystack: "arith 四則 + - * /",
+      },
+      {
+        type: "basic_cmp",
+        label: t(STR.CMP),
+        haystack: "compare 比較 = <> < <= > >=",
+      },
 
-    { type: "basic_paren", label: t(STR.PAREN), haystack: "paren 括弧 ()" },
-  ]), [t]);
+      { type: "basic_paren", label: t(STR.PAREN), haystack: "paren 括弧 ()" },
+    ],
+    [t]
+  );
 
   const q = search.trim().toLowerCase();
 
@@ -79,7 +101,9 @@ useEffect(() => {
   const [loaded, setLoaded] = useState(false);
   const [err, setErr] = useState<string>("");
 
-  const [semantic, setSemantic] = useState<{ fn: string; score: number }[] | null>(null);
+  const [semantic, setSemantic] = useState<
+    { fn: string; score: number }[] | null
+  >(null);
   const [semErr, setSemErr] = useState<string>("");
   const [isSearching, setIsSearching] = useState(false);
 
@@ -132,16 +156,13 @@ useEffect(() => {
 
     (async () => {
       try {
-
         setErr("");
         const s = await loadFnList();
-
 
         if (cancelled) return;
         setSpecs(s);
         setLoaded(true);
       } catch (e: any) {
-
         if (cancelled) return;
         setErr(String(e?.message ?? e ?? "load error"));
         setLoaded(true);
@@ -157,10 +178,9 @@ useEffect(() => {
     return specs.map((s) => {
       const name = s.name.toUpperCase();
       const vari = s.variadic ? "variadic" : "fixed";
-      const info =
-        s.variadic
-          ? `min=${s.min} step=${s.step ?? 1} max=${s.max ?? 0} ${vari}`
-          : `args=${s.min} ${vari}`;
+      const info = s.variadic
+        ? `min=${s.min} step=${s.step ?? 1} max=${s.max ?? 0} ${vari}`
+        : `args=${s.min} ${vari}`;
 
       return {
         type: fnToBlockType(name),
@@ -258,63 +278,70 @@ useEffect(() => {
     return out.slice(0, MAX_RESULTS);
   }, [q, loaded, err, excelBlocks, pinnedBlocks, semanticBlocks]);
 
-
   return (
-  <div className="py-1">
-    {!loaded && <div className="text-xs text-gray-500 py-1">{t(STR.LOADING_FUNCS)}</div>}
-
-    {loaded && err && (
-      <div className="text-xs text-red-600 py-1">{t(STR.LOAD_FAILED)}: {err}</div>
-    )}
-
-    <div className="flex items-stretch gap-2">
-      {/* 左：基本ブロック */}
-      <div className="flex flex-wrap items-center gap-2">
-        {BASE_BLOCKS.map((b) => (
-          <button
-            key={b.type}
-            type="button"
-            onClick={() => onBlockClick?.(b.type)}
-            className="px-3 py-1 rounded-full border text-xs
-                       border-emerald-300 bg-emerald-50 text-emerald-700
-                       hover:bg-emerald-100 transition"
-            title={b.label}
-          >
-            {b.label}
-          </button>
-        ))}
-      </div>
-
-      {/* 区切り：細線（固定） */}
-      {rightBlocks.length > 0 && (
-        <div className="mx-3 border-l bg-emerald-200 self-stretch" />
-
-
-
+    <div className="py-1">
+      {!loaded && (
+        <div className="text-xs text-gray-500 py-1">{t(STR.LOADING_FUNCS)}</div>
       )}
 
-      {/* 右：Pinned or 検索結果 */}
-      <div className="flex flex-wrap items-center gap-2">
-        {rightBlocks.map((b) => (
-          <button
-            key={b.type}
-            type="button"
-            onClick={() => onBlockClick?.(b.type)}
-            className="px-3 py-1 rounded-full border text-xs
+      {loaded && err && (
+        <div className="text-xs text-red-600 py-1">
+          {t(STR.LOAD_FAILED)}: {err}
+        </div>
+      )}
+
+      <div className="flex items-stretch gap-2">
+        {/* 左：基本ブロック */}
+        <div className="flex flex-wrap items-center gap-2">
+          {BASE_BLOCKS.map((b) => (
+            <button
+              key={b.type}
+              type="button"
+              onClick={() => onBlockClick?.(b.type)}
+              className="px-3 py-1 rounded-full border text-xs
                        border-emerald-300 bg-emerald-50 text-emerald-700
                        hover:bg-emerald-100 transition"
-            title={b.label}
-          >
-            {b.label}
-          </button>
-        ))}
-      </div>
+              title={b.label}
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
 
-      {loaded && !err && q.length > 0 && rightBlocks.length === 0 && (
-          <div className="text-xs text-gray-500 py-1">{t(STR.NO_BLOCKS_FOUND)}</div>
-      )}
+        {/* 区切り：細線（固定） */}
+        {rightBlocks.length > 0 && (
+          <div className="mx-3 border-l bg-emerald-200 self-stretch" />
+        )}
+
+        {/* 右：Pinned or 検索結果 */}
+        <div className="flex flex-wrap items-center gap-2">
+          {rightBlocks.map((b) => (
+            <button
+              key={b.type}
+              type="button"
+              onClick={() => {
+                onBlockClick?.(b.type);
+                // b.label が "SUM" とか関数名
+                onSelectFn?.(b.label.toUpperCase());
+              }}
+              onMouseEnter={() => onHoverFn?.(b.label.toUpperCase())}
+              onMouseLeave={() => onHoverFn?.(null)}
+              className="px-3 py-1 rounded-full border text-xs
+               border-emerald-300 bg-emerald-50 text-emerald-700
+               hover:bg-emerald-100 transition"
+              title={b.label}
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
+
+        {loaded && !err && q.length > 0 && rightBlocks.length === 0 && (
+          <div className="text-xs text-gray-500 py-1">
+            {t(STR.NO_BLOCKS_FOUND)}
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-);
-
+  );
 }
