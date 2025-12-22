@@ -20,3 +20,10 @@ Same formula, different representation.
 - **2025-12-20** – UI improvement: added function description panel
 - **2025-12-19** – Supported converting formulas into blocks
 - **2025-12-17** – Initial public release of Frockly
+
+## Roadmap (rough)
+
+- v0.35 – Named function workspaces
+- v0.4  – Lambda / let support
+- v0.5  – File tab (xlsx import, named function import/export)
+- v0.6  – Check tab (let checks, type checks)
