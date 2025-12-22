@@ -1,4 +1,4 @@
-# Frockly
+# Frockly (v0.3)
 
 Frockly is an experimental visual editor for Excel formulas.
 
@@ -14,7 +14,6 @@ https://ryuu12358.github.io/Frockly/
 Same formula, different representation.
 
 <!-- Screenshot will be added later -->
-
 
 ## Updates
 - **2025-12-22** – Added View tab for formula structure visualization and navigation
