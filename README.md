@@ -27,7 +27,7 @@ Same formula, different representation.
 - v0.4  – Lambda / let support
 - v0.5  – File tab (xlsx import, named function import/export)
 - v0.6  – Check tab (let checks, type checks)
-- 
+  
 ## Future ideas (order not decided)
 - Mobile-friendly UI
 - Argument focus shadow / guidance
