@@ -26,7 +26,7 @@ Same formula, different representation.
 - v0.35 – Named function workspaces
 - v0.4  – Lambda / let support
 - v0.5  – File tab (xlsx import, named function import/export)
-- v0.6  – Check tab (let checks, type checks)
+- v0.6  – Check tab (let hints, type checks)
   
 ## Future ideas (order not decided)
 - Mobile-friendly UI
