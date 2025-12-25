@@ -150,6 +150,7 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
                 </div>
                 {main ? (
                   <WsLine
+                    uiLang={props.uiLang}
                     selected={selectedWsId === main.id}
                     active={props.activeWorkspaceId === main.id}
                     title={main.title ?? t("MAIN_WORKSPACE")}
@@ -192,6 +193,7 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
 
                     return (
                       <WsLine
+                        uiLang={props.uiLang}
                         key={ws.id}
                         selected={selectedWsId === ws.id}
                         active={props.activeWorkspaceId === ws.id}
