@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import * as Blockly from "blockly";
-import { STR_ALL, tr } from "../../i18n/strings";
+import { STR, tr } from "../../i18n/strings";
 import "blockly/blocks";
 import { initFrockly } from "../../blockly/init/initFrockly";
 import { ExcelGen } from "../../blocks/basic/generators";
@@ -100,7 +100,7 @@ export function BlocklyWorkspace({
     const t = tr(uiLang);
     return `
       <xml xmlns="https://developers.google.com/blockly/xml">
-        <category name="${t(STR_ALL.BASIC).replace(/&/g, "&amp;")}">
+        <category name="${t(STR.BASIC).replace(/&/g, "&amp;")}">
           <block type="basic_start"></block>
 
           <block type="basic_number"></block>
@@ -116,7 +116,7 @@ export function BlocklyWorkspace({
           <!-- <block type="basic_bool"></block> -->
         </category>
 
-        <category name="${t(STR_ALL.HISTORY).replace(
+        <category name="${t(STR.HISTORY).replace(
           /&/g,
           "&amp;"
         )}" custom="FROCKLY_HISTORY"></category>
@@ -361,7 +361,7 @@ export function BlocklyWorkspace({
         if (types.length === 0) {
           const label = Blockly.utils.xml.createElement("label");
           const t = tr(uiLang);
-          label.setAttribute("text", t(STR_ALL.NO_HISTORY));
+          label.setAttribute("text", t(STR.NO_HISTORY));
           return [label];
         }
         return types.map((t) => {

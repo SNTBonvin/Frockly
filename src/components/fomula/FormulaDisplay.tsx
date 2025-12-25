@@ -1,6 +1,6 @@
 import { Copy, Check } from "lucide-react";
 import { useState } from "react";
-import { STR_ALL, tr } from "../../i18n/strings";
+import { STR, tr } from "../../i18n/strings";
 
 interface FormulaDisplayProps {
   formula: string;
@@ -26,7 +26,7 @@ export function FormulaDisplay({
     <div className="h-full flex flex-col bg-gray-50">
       {/* Header */}
       <div className="bg-gray-100 border-b border-gray-300 px-4 py-2 flex items-center justify-between">
-        <h3 className="text-emerald-700">{t(STR_ALL.GENERATED_FORMULA)}</h3>
+        <h3 className="text-emerald-700">{t(STR.GENERATED_FORMULA)}</h3>
         <button
           onClick={handleCopy}
           disabled={!formula}
@@ -43,12 +43,12 @@ export function FormulaDisplay({
           {copied ? (
             <>
               <Check className="w-4 h-4" />
-              {t(STR_ALL.COPY_DONE)}
+              {t(STR.COPY_DONE)}
             </>
           ) : (
             <>
               <Copy className="w-4 h-4" />
-              {t(STR_ALL.COPY)}
+              {t(STR.COPY)}
             </>
           )}
         </button>
@@ -67,7 +67,7 @@ export function FormulaDisplay({
           ) : (
             <div className="flex items-center justify-center h-full">
               <p className="text-gray-400 text-sm">
-                {t(STR_ALL.SELECT_BLOCK_PROMPT)}
+                {t(STR.SELECT_BLOCK_PROMPT)}
               </p>
             </div>
           )}

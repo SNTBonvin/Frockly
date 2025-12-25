@@ -6,7 +6,8 @@ function oneLine(s: string) {
 }
 function clamp(s: string, n = 90) {
   const t = oneLine(s);
-  return t.length > n ? t.slice(0, n - 1) + "…" : t;
+  const ELLIPSIS = "…";
+  return t.length > n ? t.slice(0, n - 1) + "ELLIPSIS" : t;
 }
 function computePreview(block: Blockly.Block) {
   const out = (ExcelGen as any).blockToCode(block);

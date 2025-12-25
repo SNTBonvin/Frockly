@@ -118,7 +118,7 @@ export function ensureProjectInitialized() {
       {
         id: mainId,
         kind: "main",
-        title: "メイン",
+        title: "main",
         xml: "", // 初回は空
       },
     ],

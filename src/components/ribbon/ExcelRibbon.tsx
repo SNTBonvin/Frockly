@@ -7,7 +7,7 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import { BlockPalette } from "./tabs/BlockPalette";
-import { STR_ALL, STR, tr } from "../../i18n/strings";
+import { STR, tr } from "../../i18n/strings";
 import { loadFnText, type FnTextMap } from "../../blocks/gen/fnTextLoader";
 import {
   NamedFunctionsTab,
@@ -202,18 +202,18 @@ export function ExcelRibbon({
     const base = [
       {
         id: "file" as const,
-        label: uiLang === "ja" ? "ファイル" : "File",
+        label: uiLang === "ja" ? t("TAB_FILE") : t("TAB_FILE"),
         icon: FileSpreadsheet, // 仮。後で差し替えてもええ
       },
       { id: "functions" as const, label: t(STR.FUNCTIONS), icon: Wand2 },
       {
         id: "named" as const,
-        label: uiLang === "ja" ? "名前付き関数" : "Named",
+        label: uiLang === "ja" ? t("TAB_NAMED_FUNCTIONS") : "Named",
         icon: FunctionSquare,
       },
       {
         id: "view" as const,
-        label: uiLang === "ja" ? "表示" : "View",
+        label: uiLang === "ja" ? t("VIEW") : t("VIEW"),
         icon: Eye,
       },
     ];
@@ -230,10 +230,9 @@ export function ExcelRibbon({
   const [importText, setImportText] = useState("");
 
   const isComposingRef = useRef(false);
-  const [hoverFn, setHoverFn] = useState<string | null>(null);
-  const [selectedFn, setSelectedFn] = useState<string | null>(null);
+  const [] = useState<string | null>(null);
+  const [, setSelectedFn] = useState<string | null>(null);
 
-  const activeFn = hoverFn ?? selectedFn; // ★ホバー優先
   const [fnText, setFnText] = useState<FnTextMap>({});
   const [fnTextErr, setFnTextErr] = useState<string>("");
 
@@ -464,9 +463,6 @@ export function ExcelRibbon({
             />
           </div>
         </div>
-        <div className="text-xs text-emerald-100 ml-3">
-          {uiLang === "ja" ? "現在：" : "Active: "} {activeWorkspaceTitle}
-        </div>
       </div>
 
       {/* Tabs */}
@@ -510,7 +506,7 @@ export function ExcelRibbon({
             setOpenImport(true);
           }}
         >
-          {t(STR_ALL.IMPORT_FROM_FORMULA)}
+          {t(STR.IMPORT_FROM_FORMULA)}
         </button>
 
         {/* ★ 常時表示の説明欄 */}
@@ -539,14 +535,14 @@ export function ExcelRibbon({
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-[9999]">
           <div className="bg-white rounded-xl w-[640px] max-w-[90vw] p-4">
             <div className="text-lg font-semibold mb-2">
-              {t(STR_ALL.PASTE_FORMULA)}
+              {t(STR.PASTE_FORMULA)}
             </div>
 
             <textarea
               className="w-full h-32 border rounded p-2 font-mono"
               value={importText}
               onChange={(e) => setImportText(e.target.value)}
-              placeholder={t(STR_ALL.FORMULA_PLACEHOLDER)}
+              placeholder={t(STR.FORMULA_PLACEHOLDER)}
             />
 
             <div className="flex gap-2 justify-end mt-3">
@@ -554,7 +550,7 @@ export function ExcelRibbon({
                 className="px-3 py-1 rounded border"
                 onClick={() => setOpenImport(false)}
               >
-                {t(STR_ALL.CANCEL)}
+                {t(STR.CANCEL)}
               </button>
 
               <button
@@ -565,7 +561,7 @@ export function ExcelRibbon({
 
                   const fn = getApi()?.insertFromFormula;
                   if (!fn) {
-                    alert(t(STR_ALL.IMPORT_API_NOT_READY));
+                    alert(t(STR.IMPORT_API_NOT_READY));
                     return;
                   }
 
@@ -574,11 +570,11 @@ export function ExcelRibbon({
                     setOpenImport(false);
                   } catch (e) {
                     console.error("[IMPORT] insertFromFormula crashed", e);
-                    alert(t(STR_ALL.IMPORT_FAILED));
+                    alert(t(STR.IMPORT_FAILED));
                   }
                 }}
               >
-                {t(STR_ALL.BLOCKIFY)}
+                {t(STR.BLOCKIFY)}
               </button>
             </div>
           </div>
@@ -607,6 +603,7 @@ export function ExcelRibbon({
             />
           ) : selectedTab === "named" ? (
             <NamedFunctionsTab
+              uiLang={uiLang}
               search={search}
               onUpdateFnMeta={onUpdateNamedFnMeta}
               onHoverNamed={setHoverKey}
@@ -651,21 +648,21 @@ export function ExcelRibbon({
               {/* 展開 */}
               <div className="flex items-center gap-2 mr-4">
                 <span className="text-xs text-emerald-700 font-medium">
-                  {uiLang === "ja" ? "展開" : "Expand"}
+                  {uiLang === "ja" ? t("EXPAND") : t("EXPAND")}
                 </span>
 
                 <button
                   className={emeraldBtn}
                   onClick={() => api?.view?.collapseAll?.()}
                 >
-                  {uiLang === "ja" ? "全閉じ" : "Collapse"}
+                  {uiLang === "ja" ? t("COLLAPSE") : t("COLLAPSE")}
                 </button>
 
                 <button
                   className={emeraldBtn}
                   onClick={() => api?.view?.expandAll?.()}
                 >
-                  {uiLang === "ja" ? "全展開" : "Expand"}
+                  {uiLang === "ja" ? "全展開" : t("EXPAND")}
                 </button>
 
                 <button
@@ -686,11 +683,11 @@ export function ExcelRibbon({
               {/* フォーカス */}
               <div className="flex items-center gap-2 mr-4">
                 <span className="text-xs text-emerald-700 font-medium">
-                  {uiLang === "ja" ? "フォーカス" : "Focus"}
+                  {uiLang === "ja" ? t("FOCUS") : t("FOCUS")}
                 </span>
 
                 <button className={toggleBtn(focusOn)} onClick={onToggleFocus}>
-                  {focusOn ? "ON" : "OFF"}
+                  {focusOn ? t("ON") : t("OFF")}
                 </button>
 
                 <button
@@ -711,11 +708,11 @@ export function ExcelRibbon({
               {/* ルート（道のり） */}
               <div className="flex items-center gap-2">
                 <span className="text-xs text-emerald-700 font-medium">
-                  {uiLang === "ja" ? "ルート" : "Path"}
+                  {uiLang === "ja" ? t("PATH") : t("PATH")}
                 </span>
 
                 <button className={toggleBtn(pathOn)} onClick={onTogglePath}>
-                  {pathOn ? "ON" : "OFF"}
+                  {pathOn ? t("ON") : t("OFF")}
                 </button>
 
                 <button

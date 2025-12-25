@@ -33,4 +33,5 @@ export type WorkspaceManagerModalProps = {
   ) => void;
 
   onRenameFn?: (fnId: string, newName: string) => void;
+  uiLang: "en" | "ja";
 };

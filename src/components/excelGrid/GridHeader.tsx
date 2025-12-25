@@ -1,5 +1,5 @@
 import type { CellMap, CellRef } from "./types";
-import { STR_ALL, tr } from "../../i18n/strings";
+import { STR, tr } from "../../i18n/strings";
 
 interface GridHeaderProps {
   selectedRefText: string; // "A1" or "A1:B3"

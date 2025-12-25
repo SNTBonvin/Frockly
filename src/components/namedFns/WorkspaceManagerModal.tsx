@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { FnMeta, WorkspaceManagerModalProps } from "./types";
 import { clampOneLine, joinSig } from "./text";
 import { WsLine } from "./wsLine";
+import { tr } from "../../i18n/strings";
 
 type EditDraft = {
   fnId: string;
@@ -12,6 +13,7 @@ type EditDraft = {
 
 export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
   const { main, fnWorkspaces } = props;
+  const t = tr((props as any).uiLang ?? "en");
 
   const [selectedWsId, setSelectedWsId] = useState<string>(
     props.activeWorkspaceId
@@ -103,7 +105,7 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
         {/* Header */}
         <div className="flex h-[40px] items-center border-b border-emerald-700 bg-emerald-600 px-3">
           <div className="text-sm font-semibold text-white">
-            ワークスペース管理
+            {t("WORKSPACE_MANAGER")}
           </div>
 
           <div className="ml-auto flex items-center gap-2">
@@ -111,7 +113,7 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
               className="h-[28px] border border-emerald-200 bg-emerald-50 px-3 text-xs text-emerald-900 hover:bg-white active:bg-emerald-100"
               onClick={props.onClose}
             >
-              閉じる
+              {t("CLOSE")}
             </button>
           </div>
         </div>
@@ -122,7 +124,7 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
           <div className="col-span-7 border-r border-slate-200">
             <div className="flex items-center gap-2 px-3 py-2">
               <div className="text-xs font-semibold text-slate-600">
-                ワークスペース一覧
+                {t("WORKSPACE_LIST")}
               </div>
 
               <div className="ml-auto flex items-center gap-2">
@@ -133,9 +135,9 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
                     e.stopPropagation();
                     createAndEdit();
                   }}
-                  title="新しい名前付き関数を作成"
+                  title={t("TOOLTIP_CREATE_NAMED_FN")}
                 >
-                  ＋ 新規作成
+                  ＋ {t("CREATE_NEW")}
                 </button>
               </div>
             </div>
@@ -144,13 +146,13 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
               {/* Main */}
               <div className="mb-2">
                 <div className="px-1 py-1 text-[11px] font-semibold text-slate-500">
-                  メイン
+                  {t("WORKSPACE_MAIN")}
                 </div>
                 {main ? (
                   <WsLine
                     selected={selectedWsId === main.id}
                     active={props.activeWorkspaceId === main.id}
-                    title={main.title ?? "メインワークスペース"}
+                    title={main.title ?? t("MAIN_WORKSPACE")}
                     subtitle=""
                     onClick={() => setSelectedWsId(main.id)}
                     onOpen={() => props.onSwitchWorkspace(main.id)}
@@ -161,7 +163,7 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
                   />
                 ) : (
                   <div className="px-2 py-2 text-xs text-slate-500">
-                    メインワークスペースが見つかりません（異常）
+                    {t("ERROR_MAIN_WORKSPACE_NOT_FOUND")}
                   </div>
                 )}
               </div>
@@ -169,12 +171,12 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
               {/* Named */}
               <div>
                 <div className="px-1 py-1 text-[11px] font-semibold text-slate-500">
-                  名前付き関数
+                  {t("TAB_NAMED_FUNCTIONS")}
                 </div>
 
                 {fnWorkspaces.length === 0 && (
                   <div className="px-2 py-2 text-xs text-slate-500">
-                    まだ名前付き関数がありません
+                    {t("NO_NAMED_FUNCTIONS")}
                   </div>
                 )}
 
@@ -208,9 +210,10 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
                           canOperate
                             ? () => {
                                 const ok = window.confirm(
-                                  `「${
+                                  t("CONFIRM_DELETE_NAMED_FN").replace(
+                                    "{name}",
                                     fn?.name ?? ws.title ?? "???"
-                                  }」を削除しますか？\n呼び出しブロックは未定義状態になります。`
+                                  )
                                 );
                                 if (!ok) return;
                                 props.onDeleteFn(fnId);
@@ -229,10 +232,14 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
           {/* Right editor */}
           <div className="col-span-5">
             <div className="flex items-center border-b border-slate-200 bg-white px-3 py-2">
-              <div className="text-xs font-semibold text-slate-600">編集</div>
+              <div className="text-xs font-semibold text-slate-600">
+                {t("EDIT")}
+              </div>
               <div className="ml-auto">
                 {dirty && (
-                  <div className="text-[11px] text-slate-500">未保存</div>
+                  <div className="text-[11px] text-slate-500">
+                    {t("UNSAVED")}
+                  </div>
                 )}
               </div>
             </div>
@@ -240,16 +247,18 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
             <div className="max-h-[70vh] overflow-y-auto p-3">
               {selectedIsMain ? (
                 <div className="text-sm text-slate-700">
-                  <div className="mb-2 font-semibold">メインワークスペース</div>
+                  <div className="mb-2 font-semibold">
+                    {t("MAIN_WORKSPACE")}
+                  </div>
                   <div className="text-xs text-slate-500">
-                    メインはここでは編集しません。「開く」で切り替えて編集してください。
+                    {t("MAIN_WORKSPACE_HELP")}
                   </div>
                 </div>
               ) : editingFnId && draft ? (
                 <>
                   <div className="mb-3">
                     <div className="mb-1 text-[11px] font-semibold text-slate-600">
-                      関数名
+                      {t("LABEL_FUNCTION_NAME")}
                     </div>
                     <input
                       autoFocus
@@ -261,12 +270,12 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
                         );
                         setDirty(true);
                       }}
-                      placeholder="関数名"
+                      placeholder={t("PLACEHOLDER_FUNCTION_NAME")}
                     />
                   </div>
                   <div className="mb-3">
                     <div className="mb-1 text-[11px] font-semibold text-slate-600">
-                      説明
+                      {t("LABEL_DESCRIPTION")}
                     </div>
                     <textarea
                       className="w-full border border-slate-300 bg-white px-2 py-1 text-sm outline-none focus:border-slate-500"
@@ -278,7 +287,7 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
                         );
                         setDirty(true);
                       }}
-                      placeholder="説明（検索・ホバーで表示されます）"
+                      placeholder={t("PLACEHOLDER_DESCRIPTION")}
                     />
                   </div>
 
@@ -287,7 +296,7 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
                       className="h-[30px] border border-slate-300 bg-white px-3 text-xs hover:bg-slate-100 active:bg-slate-200"
                       onClick={cancelEdit}
                     >
-                      キャンセル
+                      {t("CANCEL")}
                     </button>
 
                     <button
@@ -296,25 +305,27 @@ export function WorkspaceManagerModal(props: WorkspaceManagerModalProps) {
                       onClick={saveEdit}
                       title={
                         !props.onUpdateFnMeta
-                          ? "onUpdateFnMeta が未接続です"
+                          ? t("WARN_ON_UPDATE_META_MISSING_TITLE")
                           : ""
                       }
                     >
-                      保存
+                      {t("SAVE")}
                     </button>
                   </div>
 
                   {!props.onUpdateFnMeta && (
                     <div className="mt-2 text-xs text-slate-500">
-                      ※ onUpdateFnMeta が未接続のため、現状は保存できません
+                      {t("WARN_ON_UPDATE_META_MISSING_NOTE")}
                     </div>
                   )}
                 </>
               ) : (
                 <div className="text-sm text-slate-700">
-                  <div className="mb-2 font-semibold">編集の使い方</div>
+                  <div className="mb-2 font-semibold">
+                    {t("HOW_TO_EDIT_TITLE")}
+                  </div>
                   <div className="text-xs text-slate-500">
-                    左の一覧で関数を選んで「編集」を押すと、ここに編集フォームが出ます。
+                    {t("HOW_TO_EDIT_BODY")}
                   </div>
 
                   {selectedFn && (

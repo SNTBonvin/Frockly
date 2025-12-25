@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { RibbonButton } from "./RibbonButton";
 import { RibbonSeparator } from "./RibbonSeparator";
 import { WorkspaceManagerModal } from "../../namedFns/WorkspaceManagerModal";
+import { tr } from "../../../i18n/strings";
 
 export type NamedFnItem = {
   id: string;
@@ -22,6 +23,7 @@ export type WorkspaceItem = {
 type CreateFnResult = { fnId: string; wsId: string };
 
 type Props = {
+  uiLang: "en" | "ja";
   search?: string;
   fns: NamedFnItem[];
   onInsertCurrentParam?: () => void;
@@ -42,6 +44,7 @@ type Props = {
   // ★メインへ自動切替して挿入（確定仕様）
   onInsertToMain: (fnId: string) => void;
 };
+
 function scoreNamed(fn: NamedFnItem, q: string) {
   const name = (fn.name ?? "").toLowerCase();
   const desc = (fn.description ?? "").toLowerCase();
@@ -53,6 +56,8 @@ function scoreNamed(fn: NamedFnItem, q: string) {
 }
 
 export function NamedFunctionsTab(props: Props) {
+  const t = tr(props.uiLang);
+
   const q = (props.search ?? "").trim().toLowerCase();
   const visibleFns = useMemo(() => {
     if (!q) return props.fns;
@@ -63,7 +68,11 @@ export function NamedFunctionsTab(props: Props) {
       .sort((a, b) => b.s - a.s || a.fn.name.localeCompare(b.fn.name))
       .map((x) => x.fn);
   }, [props.fns, q]);
+
   const [open, setOpen] = useState(false);
+
+  // 署名文字列は共通化しとくと便利
+  const sigOf = (fn: NamedFnItem) => `${fn.name}(${fn.params.join(", ")})`;
 
   return (
     <div className="py-1">
@@ -75,7 +84,13 @@ export function NamedFunctionsTab(props: Props) {
             <RibbonButton
               key={fn.id}
               title={[
-                `${fn.name}(${fn.params.join(", ")}) を現在のWSに挿入`,
+                // ★キー例: NAMED_FN_TOOLTIP_INSERT_CURRENT_WS
+                // en: "{sig} into current WS"
+                // ja: "{sig} を現在のWSに挿入"
+                t("NAMED_TOOLTIP_INSERT_TO_CURRENT_WS").replace(
+                  "{sig}",
+                  sigOf(fn)
+                ),
                 fn.description ? `\n${fn.description}` : "",
               ].join("")}
               onClick={() => props.onInsertCurrent(fn.id)}
@@ -92,7 +107,10 @@ export function NamedFunctionsTab(props: Props) {
           ))}
 
           {visibleFns.length === 0 && (
-            <div className="text-xs opacity-60 py-1">検索結果なし</div>
+            // ★キー例: NO_SEARCH_RESULTS
+            <div className="text-xs opacity-60 py-1">
+              {t("NO_SEARCH_RESULTS")}
+            </div>
           )}
         </div>
 
@@ -103,18 +121,23 @@ export function NamedFunctionsTab(props: Props) {
         <div className="flex items-center gap-2">
           {props.onInsertCurrentParam && (
             <RibbonButton
-              title="param ブロックを現在のWSに挿入"
+              // ★キー例: TOOLTIP_INSERT_PARAM_BLOCK_CURRENT_WS
+              title={t("NAMED_TOOLTIP_INSERT_PARAM_BLOCK")}
               onClick={() => props.onInsertCurrentParam?.()}
             >
               ＋param
             </RibbonButton>
           )}
-          <RibbonButton onClick={() => setOpen(true)}>管理…</RibbonButton>
+          {/* ★キー例: MANAGE_ELLIPSIS */}
+          <RibbonButton onClick={() => setOpen(true)}>
+            {t("NAMED_MANAGE")}
+          </RibbonButton>
         </div>
       </div>
 
       {open && (
         <WorkspaceManageModal
+          uiLang={props.uiLang} // ★ここが重要（uiLang変数は存在せん）
           workspaces={props.workspaces}
           activeWorkspaceId={props.activeWorkspaceId}
           fns={props.fns}
@@ -138,6 +161,7 @@ export function NamedFunctionsTab(props: Props) {
 }
 
 function WorkspaceManageModal(props: {
+  uiLang: "en" | "ja"; // ★追加
   workspaces: WorkspaceItem[];
   activeWorkspaceId: string;
   fns: NamedFnItem[];
@@ -185,6 +209,7 @@ function WorkspaceManageModal(props: {
 
   return (
     <WorkspaceManagerModal
+      uiLang={props.uiLang}
       onClose={props.onClose}
       main={main ? { id: main.id, title: main.title, fnId: main.fnId } : null}
       fnWorkspaces={fnWorkspaces.map((w) => ({
@@ -193,7 +218,7 @@ function WorkspaceManageModal(props: {
         fnId: w.fnId,
       }))}
       activeWorkspaceId={props.activeWorkspaceId}
-      fnByWsId={fnByWsId as any} // ←ここは下でちゃんと型を合わせる案も出す
+      fnByWsId={fnByWsId as any} // ←ここは後で型ちゃんと合わせてもOK
       onSwitchWorkspace={props.onSwitchWorkspace}
       onInsertToMain={props.onInsertToMain}
       onDuplicateFn={props.onDuplicateFn}

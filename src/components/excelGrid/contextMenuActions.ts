@@ -1,8 +1,13 @@
 import type { CellMap, CellRange, CellRef } from "./types";
 import { formatRange, normalizeRange } from "./cellRef";
 import { writeClipboardText } from "./clipboard";
-import { rangeToTsv, clearAllInRange, clearStyleInRange, clearValueInRange } from "./rangeOps";
-import { tr, STR_ALL_MERGED } from "../../i18n/strings";
+import {
+  rangeToTsv,
+  clearAllInRange,
+  clearStyleInRange,
+  clearValueInRange,
+} from "./rangeOps";
+import { tr, STR } from "../../i18n/strings";
 
 export type MenuAction =
   | { id: "copy_ref"; label: string }
@@ -24,16 +29,16 @@ export function buildMenuActions(opts: {
   const hasRange = !!opts.range && opts.inRangeContext;
 
   return [
-    { id: "copy_ref", label: t(STR_ALL_MERGED.COPY_REF) },
-    { id: "copy_value", label: t(STR_ALL_MERGED.COPY_VALUE), enabled: !hasRange },
-    { id: "copy_tsv", label: t(STR_ALL_MERGED.COPY_TSV), enabled: hasRange },
+    { id: "copy_ref", label: t(STR.COPY_REF) },
+    { id: "copy_value", label: t(STR.COPY_VALUE), enabled: !hasRange },
+    { id: "copy_tsv", label: t(STR.COPY_TSV), enabled: hasRange },
 
-    { id: "paste", label: t(STR_ALL_MERGED.PASTE) },
-    { id: "add_ref_block", label: t(STR_ALL_MERGED.ADD_REF_BLOCK) },
+    { id: "paste", label: t(STR.PASTE) },
+    { id: "add_ref_block", label: t(STR.ADD_REF_BLOCK) },
 
-    { id: "clear_value", label: t(STR_ALL_MERGED.CLEAR_VALUE) },
-    { id: "clear_style", label: t(STR_ALL_MERGED.CLEAR_STYLE) },
-    { id: "clear_all", label: t(STR_ALL_MERGED.CLEAR_ALL) },
+    { id: "clear_value", label: t(STR.CLEAR_VALUE) },
+    { id: "clear_style", label: t(STR.CLEAR_STYLE) },
+    { id: "clear_all", label: t(STR.CLEAR_ALL) },
   ];
 }
 
@@ -69,7 +74,9 @@ export async function runMenuAction(args: {
 
     case "copy_value":
       if (hasRange) return;
-      await writeClipboardText(args.cells[args.selectedCell]?.displayText ?? "");
+      await writeClipboardText(
+        args.cells[args.selectedCell]?.displayText ?? ""
+      );
       return;
 
     case "copy_tsv":
@@ -87,21 +94,30 @@ export async function runMenuAction(args: {
 
     case "clear_value":
       args.setCells((prev) => {
-        const r = hasRange && args.range ? args.range : { a: args.selectedCell, b: args.selectedCell };
+        const r =
+          hasRange && args.range
+            ? args.range
+            : { a: args.selectedCell, b: args.selectedCell };
         return clearValueInRange(prev, r);
       });
       return;
 
     case "clear_style":
       args.setCells((prev) => {
-        const r = hasRange && args.range ? args.range : { a: args.selectedCell, b: args.selectedCell };
+        const r =
+          hasRange && args.range
+            ? args.range
+            : { a: args.selectedCell, b: args.selectedCell };
         return clearStyleInRange(prev, r);
       });
       return;
 
     case "clear_all":
       args.setCells((prev) => {
-        const r = hasRange && args.range ? args.range : { a: args.selectedCell, b: args.selectedCell };
+        const r =
+          hasRange && args.range
+            ? args.range
+            : { a: args.selectedCell, b: args.selectedCell };
         return clearAllInRange(prev, r);
       });
       return;

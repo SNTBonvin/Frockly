@@ -347,7 +347,7 @@ export function registerBasicBlocks(lang: UiLang) {
       this.setOutput(true, null);
       this.setColour(C_BOOL);
       Blockly.Extensions.apply("frockly_basic_ui", this, false);
-      this.setTooltip("TRUE / FALSE");
+      this.setTooltip(t("TOOLTIP_BOOL"));
     },
   };
 
@@ -355,8 +355,8 @@ export function registerBasicBlocks(lang: UiLang) {
   Blockly.Blocks["basic_var"] = {
     init: function () {
       this.appendDummyInput()
-        .appendField("変数")
-        .appendField(new Blockly.FieldTextInput("x"), "var");
+        .appendField(t("NAME"))
+        .appendField(new Blockly.FieldTextInput("x"), t("NAME"));
 
       // 出力は「識別子」専用
       this.setOutput(true, "VAR");
