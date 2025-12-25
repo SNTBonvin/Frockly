@@ -1,4 +1,4 @@
-# Frockly (v0.5)
+#す#す# Frockly (v
 
 Frockly is a visual editor for understanding and refactoring complex Excel formulas.
 
@@ -35,7 +35,7 @@ Frockly is designed for **understanding and refactoring**, not execution.
 
 Same formula, different representation.
 
-(Insert GIFs or screenshots here)
+![Frockly demo](picture_pc_74868d83e65cb83a4d48c9e528e6f93e.gif)
 
 ## Why
 
