@@ -174,7 +174,6 @@ export function ExcelRibbon({
   onDuplicateNamedFn,
   onDeleteNamedFn,
   onRenameNamedFn,
-  activeWorkspaceTitle,
   onUpdateNamedFnMeta,
   onImportXlsx,
   sheets,
