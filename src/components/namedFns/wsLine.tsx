@@ -1,6 +1,8 @@
 import React from "react";
+import { tr } from "../../i18n/strings";
 
 export function WsLine(props: {
+  uiLang: "en" | "ja"; // ★追加
   selected: boolean;
   active: boolean;
   title: string;
@@ -14,6 +16,8 @@ export function WsLine(props: {
   onDuplicate: (() => void) | null;
   onDelete: (() => void) | null;
 }) {
+  const t = tr(props.uiLang);
+
   const border = props.selected ? "border-slate-500" : "border-slate-200";
   const bg = props.selected ? "bg-slate-50" : "bg-white";
   const activeMark = props.active ? "●" : " ";
@@ -25,7 +29,7 @@ export function WsLine(props: {
     >
       <div
         className="w-[12px] text-[10px] text-slate-500"
-        title="開いているワークスペース"
+        title={t("WORKSPACE_ACTIVE_TOOLTIP")}
       >
         {activeMark}
       </div>
@@ -42,32 +46,44 @@ export function WsLine(props: {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <MiniBtn disabled={!props.onOpen} onClick={props.onOpen} title="開く">
-          開く
+        <MiniBtn
+          disabled={!props.onOpen}
+          onClick={props.onOpen}
+          title={t("OPEN")}
+        >
+          {t("OPEN")}
         </MiniBtn>
+
         <MiniBtn
           disabled={!props.onInsert}
           onClick={props.onInsert}
-          title="メインに挿入"
+          title={t("INSERT_TO_MAIN")}
         >
-          挿入
+          {t("INSERT")}
         </MiniBtn>
-        <MiniBtn disabled={!props.onEdit} onClick={props.onEdit} title="編集">
-          編集
+
+        <MiniBtn
+          disabled={!props.onEdit}
+          onClick={props.onEdit}
+          title={t("EDIT")}
+        >
+          {t("EDIT")}
         </MiniBtn>
+
         <MiniBtn
           disabled={!props.onDuplicate}
           onClick={props.onDuplicate}
-          title="複製"
+          title={t("DUPLICATE")}
         >
-          複製
+          {t("DUPLICATE")}
         </MiniBtn>
+
         <MiniBtn
           disabled={!props.onDelete}
           onClick={props.onDelete}
-          title="削除"
+          title={t("DELETE")}
         >
-          削除
+          {t("DELETE")}
         </MiniBtn>
       </div>
     </div>
@@ -87,7 +103,7 @@ function MiniBtn(props: {
       title={props.title}
       onClick={(e) => {
         e.preventDefault();
-        e.stopPropagation(); // 行クリック（選択）と分離
+        e.stopPropagation();
         props.onClick?.();
       }}
     >

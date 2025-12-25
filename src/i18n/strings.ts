@@ -179,7 +179,14 @@ export const STR_FILETAB = {
 export const STR_NAMED_FN = {
   CREATE_NEW: { en: "Create new", ja: "新規作成" },
   RENAME: { en: "Rename", ja: "名前を変更" },
-
+  SAVE: { en: "Save", ja: "保存" },
+  OPEN: { en: "Open", ja: "開く" },
+  WORKSPACE_ACTIVE_TOOLTIP: {
+    en: "Workspace active tooltip",
+    ja: "開いているワークスペース",
+  },
+  INSERT_TO_MAIN: { en: "Insert to main", ja: "メインに挿入" },
+  INSERT: { en: "Insert", ja: "挿入" },
   INSERT_FUNCTION: { en: "Insert function", ja: "関数を挿入" },
   INSERT_CURRENT_PARAM: {
     en: "Insert current param",
