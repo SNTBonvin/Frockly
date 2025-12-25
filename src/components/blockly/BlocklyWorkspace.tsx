@@ -17,6 +17,7 @@ import { setCallFnMeta } from "../../blocks/fn/fn_call.ts";
 import type { CellRange } from "../excelGrid/types";
 // components/blockly/BlocklyWorkspace.tsx
 import type { WorkspaceApi } from "./types";
+import { blockFromFormula } from "../../formula/index.ts";
 
 export type BlocklyWorkspaceProps = {
   category: string;
@@ -476,14 +477,18 @@ export function BlocklyWorkspace({
           onHostPointerDown();
         },
         // ★追加：数式→ブロック
-        insertFromFormula: () => {
+        insertFromFormula: (formulaText: string) => {
           const w = wsRef.current;
+          console.log("[WS] insertFromFormula", { hasWs: !!w, formulaText });
 
           if (!w) return;
 
           try {
             // 既存を消したいなら一旦OFFで（まず動作優先）
             // w.clear();
+
+            const start = blockFromFormula(w, formulaText);
+            console.log("[WS] blockFromFormula OK", { startId: start?.id });
 
             w.resize();
           } catch (e) {
