@@ -1,4 +1,4 @@
-### Frockly (v0.6)
+### Frockly (v0.5)
 
 Frockly is a visual editor for understanding and refactoring complex Excel formulas.
 
