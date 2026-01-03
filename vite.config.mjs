@@ -4,7 +4,7 @@ import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  base: "/Frockly/", // ★ GitHub Pages 用（リポジトリ名）
+  base: "/", // ★ Netlify deployment
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: { "@": path.resolve(process.cwd(), "src") },
